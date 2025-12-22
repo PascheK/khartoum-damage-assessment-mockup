@@ -1,142 +1,154 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { siteConfig } from "@/config/site";
-import { Check, Copy } from "lucide-react";
-import { useState } from "react";
+
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import KhartoumStoryMap from "@/components/KhartoumStoryMap";
+import { Container } from "@/components/layout/container";
 
 export default function Page() {
-  const [copied, setCopied] = useState(false);
-  const npxCommand = `npx create-unops-app@latest <my-unops-app>`;
+  const storyPinRef = useRef<HTMLDivElement | null>(null);
+  const storyVisualRef = useRef<HTMLDivElement | null>(null);
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(npxCommand);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
-    }
-  };
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const pinEl = storyPinRef.current;
+    const visualEl = storyVisualRef.current;
+    if (!pinEl || !visualEl) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
+    const ctx = gsap.context(() => {
+      // We keep the visual element at a constant (large) size and animate only scale.
+      // This avoids Mapbox constantly reloading tiles during width/height changes.
+      gsap.set(visualEl, {
+        scale: 0.67, // 60vh / 90vh ≈ 0.666
+        borderRadius: 16,
+        boxShadow: "0 0px 0px rgba(0,0,0,0)",
+        willChange: "transform",
+      });
+
+      // Zoom IN -> Zoom OUT pendant que c’est pin
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: pinEl,
+          start: "top top",
+          end: "+=200%", // distance de scroll pendant laquelle on joue l’animation
+          scrub: true,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      // Zoom IN
+      tl.to(
+        visualEl,
+        {
+          scale: 1,
+          borderRadius: 28,
+          boxShadow: "0 30px 90px rgba(0,0,0,0.25)",
+          ease: "none",
+        },
+        0
+      );
+
+      // Zoom OUT (pour “sortir” et continuer l’histoire)
+      tl.to(
+        visualEl,
+        {
+          scale: 0.67,
+          borderRadius: 16,
+          boxShadow: "0 0px 0px rgba(0,0,0,0)",
+          ease: "none",
+        },
+        0.65
+      );
+    }, pinEl);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <div className="space-y-16">
-      {/* Hero Section */}
-      <section className="space-y-6">
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-            {siteConfig.name}
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            {siteConfig.description}
-          </p>
-        </div>
-        <div className="flex gap-4">
-          <a
-            href={siteConfig.links.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
-          >
-            View on GitHub
-          </a>
-          <a
-            href={siteConfig.links.docs}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-2 border border-border rounded-lg hover:bg-accent transition-colors"
-          >
-            Documentation
-          </a>
-        </div>
-      </section>
+    <>
+      {/* Hero */}
+      <section
+        id="top"
+        className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4"
+      >
+        <div className="max-w-3xl mx-auto text-center space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 tracking-tight">
+              Khartoum Damage Assessment
+            </h1>
+            <p className="text-xl text-gray-600">
+              Explore conflict impact through interactive story mapping
+            </p>
+          </div>
 
-      {/* Features Section */}
-      <section className="space-y-6">
-        <h2 className="text-2xl font-bold">What&apos;s Inside</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="p-6 border border-border rounded-lg"
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="#story"
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-block"
             >
-              <h3 className="font-semibold mb-2">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="space-y-6 py-12 border-t border-border">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Ready to Build?</h2>
-          <p className="text-muted-foreground max-w-2xl">
-            Start building your UN/UNOPS project with this clean,
-            production-ready starter.
-          </p>
-          <div className="flex flex-row gap-3 justify-center">
-            <code className="bg-muted rounded-md px-4 py-2 text-sm font-mono">
-              {npxCommand}
-            </code>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipContent className="font-mono">
-                  Copy npx command
-                </TooltipContent>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={copyToClipboard}
-                    variant="outline"
-                    className="p-4"
-                    aria-label="Copy npx command to clipboard"
-                  >
-                    {copied ? (
-                      <Check className="size-4" />
-                    ) : (
-                      <Copy className="size-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-              </Tooltip>
-            </TooltipProvider>
+              Start story
+            </a>
+            <a
+              href="#next"
+              className="px-8 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-900 transition-colors inline-block"
+            >
+              Skip
+            </a>
           </div>
         </div>
       </section>
-    </div>
+
+      {/* Story */}
+      <section id="story" className="py-20">
+        <Container>
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900">Story Map (3D)</h2>
+            <p className="text-sm text-gray-600 mt-2">
+              Scroll on the map: zoom in → keep scrolling: zoom out → continue.
+            </p>
+          </div>
+        </Container>
+
+        {/* Pin zone */}
+        <div
+          ref={storyPinRef}
+          className="mt-8 min-h-screen flex items-center justify-center px-4"
+        >
+          {/* Layout frame keeps page flow stable */}
+          <div className="relative w-full max-w-6xl h-[60vh] max-h-[700px]">
+            {/* Centered host (doesn't affect layout) */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              {/* Visual element stays big; GSAP animates its scale */}
+              <div
+                ref={storyVisualRef}
+                className="w-[90vw] h-[90vh] rounded-2xl overflow-hidden bg-gray-200"
+              >
+                <KhartoumStoryMap />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Next section (placeholder) */}
+      <section id="next" className="py-24 bg-gray-50">
+        <Container>
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900">Next section</h2>
+            <p className="mt-3 text-gray-600">
+              Ici, on mettra la suite de l’histoire (textes, charts, etc.).
+            </p>
+          </div>
+        </Container>
+      </section>
+    </>
   );
 }
-
-const features = [
-  {
-    title: "Next.js 16+",
-    description: "App Router with TypeScript for modern React development",
-  },
-  {
-    title: "UN/UNOPS Theme",
-    description: "Pre-configured with CSS variables and Tailwind tokens",
-  },
-  {
-    title: "Global Layout",
-    description: "Header, Container, and Footer components ready to use",
-  },
-  {
-    title: "Clean Architecture",
-    description: "Organized folder structure under /src for scalability",
-  },
-  {
-    title: "shadcn CLI Compatible",
-    description: "Install components from the registry with ease",
-  },
-  {
-    title: "Vercel Ready",
-    description: "Serverless-friendly with zero special configuration needed",
-  },
-];

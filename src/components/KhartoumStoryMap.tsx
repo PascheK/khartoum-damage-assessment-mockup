@@ -54,7 +54,11 @@ function buildFilter(categories?: string[], statuses?: string[]) {
   return clauses.length === 1 ? null : clauses;
 }
 
-export default function KhartoumStoryMap() {
+export default function KhartoumStoryMap({
+  phase = "pre",
+}: {
+  phase?: "pre" | "post";
+}) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -74,175 +78,178 @@ export default function KhartoumStoryMap() {
     lines: string[];
   } | null>(null);
 
-  const steps: Step[] = useMemo(
-    () => [
-      {
-        id: "baseline",
-        title: "Establishing the baseline",
-        body: "Overview of the built environment. Use Next/Previous to follow the story.",
-        camera: {
-          center: [32.55, 15.51666667],
-          zoom: 16.8,
-          pitch: 55,
-          bearing: -15,
-          durationMs: 1500,
-        },
-        actions: {
-          mode: "pre",
-          categories: undefined,
-          statuses: undefined,
-          heightScale: 1,
-          outlineDamaged: false,
-          popup: {
-            title: "Step 1 · Baseline",
-            body: "We start with a broad view before focusing on specific infrastructure.",
+  const stories = useMemo(
+    () => ({
+      pre: [
+        {
+          id: "baseline",
+          title: "Establishing the baseline",
+          body: "Overview of the built environment. Use Next/Previous to follow the story.",
+          camera: {
+            center: [32.55, 15.51666667],
+            zoom: 16.8,
+            pitch: 55,
+            bearing: -15,
+            durationMs: 1500,
+          },
+          actions: {
+            mode: "pre",
+            categories: undefined,
+            statuses: undefined,
+            heightScale: 1,
+            outlineDamaged: false,
+            popup: {
+              title: "Step 1 · Baseline",
+              body: "We start with a broad view before focusing on specific infrastructure.",
+            },
           },
         },
-      },
-      {
-        id: "categories",
-        title: "Critical infrastructure categories",
-        body: "Highlight key categories (education, health, water, power…). This is a baseline classification.",
-        camera: {
-          center: [32.55, 15.51666667],
-          zoom: 17.3,
-          pitch: 60,
-          bearing: 20,
-          durationMs: 1500,
-        },
-        actions: {
-          mode: "pre",
-          categories: ["education", "health", "water", "power"],
-          statuses: undefined,
-          heightScale: 1,
-          outlineDamaged: false,
-          popup: {
-            title: "Step 2 · Categories",
-            body: "We filter the map to focus on critical infrastructure categories.",
+        {
+          id: "categories",
+          title: "Critical infrastructure categories",
+          body: "Highlight key categories (education, health, water, power…). This is a baseline classification.",
+          camera: {
+            center: [32.55, 15.51666667],
+            zoom: 17.3,
+            pitch: 60,
+            bearing: 20,
+            durationMs: 1500,
+          },
+          actions: {
+            mode: "pre",
+            categories: ["education", "health", "water", "power"],
+            statuses: undefined,
+            heightScale: 1,
+            outlineDamaged: false,
+            popup: {
+              title: "Step 2 · Categories",
+              body: "We filter the map to focus on critical infrastructure categories.",
+            },
           },
         },
-      },
-      {
-        id: "damage-overview",
-        title: "Assessing damage (overview)",
-        body: "Switch to a post-conflict lens. Damaged features are emphasized for quick scanning.",
-        camera: {
-          center: [32.55, 15.51666667],
-          zoom: 17.0,
-          pitch: 60,
-          bearing: -35,
-          durationMs: 1700,
-        },
-        actions: {
-          mode: "post",
-          categories: undefined,
-          statuses: ["damaged"],
-          heightScale: 1.2,
-          outlineDamaged: true,
-          popup: {
-            title: "Step 3 · Damage overview",
-            body: "Damaged buildings are filtered and outlined to support rapid assessment.",
+      ] as Step[],
+      post: [
+        {
+          id: "damage-overview",
+          title: "Assessing damage (overview)",
+          body: "Switch to a post-conflict lens. Damaged features are emphasized for quick scanning.",
+          camera: {
+            center: [32.55, 15.51666667],
+            zoom: 17.0,
+            pitch: 60,
+            bearing: -35,
+            durationMs: 1700,
+          },
+          actions: {
+            mode: "post",
+            categories: undefined,
+            statuses: ["damaged"],
+            heightScale: 1.2,
+            outlineDamaged: true,
+            popup: {
+              title: "Step 1 · Damage overview",
+              body: "Damaged buildings are filtered and outlined to support rapid assessment.",
+            },
           },
         },
-      },
-      {
-        id: "hospital",
-        title: "Case focus: Hospital",
-        body: "Zoom into a health facility area. Click buildings to inspect attributes.",
-        camera: {
-          center: [32.5532, 15.5159],
-          zoom: 18.6,
-          pitch: 65,
-          bearing: 10,
-          durationMs: 1700,
-        },
-        actions: {
-          mode: "post",
-          categories: ["health"],
-          statuses: ["damaged", "undamaged", "unknown"],
-          heightScale: 1.25,
-          outlineDamaged: true,
-          popup: {
-            title: "Step 4 · Hospital focus",
-            body: "We focus on health infrastructure for situational awareness.",
+        {
+          id: "hospital",
+          title: "Case focus: Hospital",
+          body: "Zoom into a health facility area. Click buildings to inspect attributes.",
+          camera: {
+            center: [32.5532, 15.5159],
+            zoom: 18.6,
+            pitch: 65,
+            bearing: 10,
+            durationMs: 1700,
+          },
+          actions: {
+            mode: "post",
+            categories: ["health"],
+            statuses: ["damaged", "undamaged", "unknown"],
+            heightScale: 1.25,
+            outlineDamaged: true,
+            popup: {
+              title: "Step 2 · Hospital focus",
+              body: "We focus on health infrastructure for situational awareness.",
+            },
           },
         },
-      },
-      {
-        id: "school",
-        title: "Case focus: School",
-        body: "Zoom into an education facility area. Height scale can be used as emphasis for storytelling.",
-        camera: {
-          center: [32.5489, 15.5182],
-          zoom: 18.5,
-          pitch: 65,
-          bearing: -20,
-          durationMs: 1700,
-        },
-        actions: {
-          mode: "post",
-          categories: ["education"],
-          statuses: ["damaged", "undamaged", "unknown"],
-          heightScale: 1.35,
-          outlineDamaged: true,
-          popup: {
-            title: "Step 5 · School focus",
-            body: "Education sites can be spotlighted for recovery planning priorities.",
+        {
+          id: "school",
+          title: "Case focus: School",
+          body: "Zoom into an education facility area. Height scale can be used as emphasis for storytelling.",
+          camera: {
+            center: [32.5489, 15.5182],
+            zoom: 18.5,
+            pitch: 65,
+            bearing: -20,
+            durationMs: 1700,
+          },
+          actions: {
+            mode: "post",
+            categories: ["education"],
+            statuses: ["damaged", "undamaged", "unknown"],
+            heightScale: 1.35,
+            outlineDamaged: true,
+            popup: {
+              title: "Step 3 · School focus",
+              body: "Education sites can be spotlighted for recovery planning priorities.",
+            },
           },
         },
-      },
-      {
-        id: "recovery-planning",
-        title: "Recovery planning",
-        body: "Return to a broader view to support reconstruction planning and prioritization.",
-        camera: {
-          center: [32.55, 15.51666667],
-          zoom: 16.9,
-          pitch: 55,
-          bearing: 25,
-          durationMs: 1700,
-        },
-        actions: {
-          mode: "post",
-          categories: ["health", "education", "water", "power"],
-          statuses: undefined,
-          heightScale: 1.1,
-          outlineDamaged: true,
-          popup: {
-            title: "Step 6 · Recovery planning",
-            body: "Broader overview helps compare categories and identify priority clusters.",
+        {
+          id: "recovery-planning",
+          title: "Recovery planning",
+          body: "Return to a broader view to support reconstruction planning and prioritization.",
+          camera: {
+            center: [32.55, 15.51666667],
+            zoom: 16.9,
+            pitch: 55,
+            bearing: 25,
+            durationMs: 1700,
+          },
+          actions: {
+            mode: "post",
+            categories: ["health", "education", "water", "power"],
+            statuses: undefined,
+            heightScale: 1.1,
+            outlineDamaged: true,
+            popup: {
+              title: "Step 4 · Recovery planning",
+              body: "Broader overview helps compare categories and identify priority clusters.",
+            },
           },
         },
-      },
-      {
-        id: "explore",
-        title: "Explore mode",
-        body: "You can now explore freely. Use the toggle to lock back into story mode anytime.",
-        camera: {
-          center: [32.55, 15.51666667],
-          zoom: 17.2,
-          pitch: 58,
-          bearing: 0,
-          durationMs: 1200,
-        },
-        actions: {
-          mode: "post",
-          categories: undefined,
-          statuses: undefined,
-          heightScale: 1,
-          outlineDamaged: true,
-          popup: {
-            title: "Step 7 · Explore",
-            body: "Story steps are finished—feel free to inspect buildings and navigate freely.",
+        {
+          id: "explore",
+          title: "Explore mode",
+          body: "You can now explore freely. Use the toggle to lock back into story mode anytime.",
+          camera: {
+            center: [32.55, 15.51666667],
+            zoom: 17.2,
+            pitch: 58,
+            bearing: 0,
+            durationMs: 1200,
+          },
+          actions: {
+            mode: "post",
+            categories: undefined,
+            statuses: undefined,
+            heightScale: 1,
+            outlineDamaged: true,
+            popup: {
+              title: "Step 5 · Explore",
+              body: "Story steps are finished—feel free to inspect buildings and navigate freely.",
+            },
           },
         },
-      },
-    ],
+      ] as Step[],
+    }),
     []
   );
 
-  const currentStep = steps[stepIndex];
-
+  const steps = phase === "post" ? stories.post : stories.pre;
   const applyStep = useCallback(
     (idx: number) => {
       const map = mapRef.current;
@@ -303,6 +310,16 @@ export default function KhartoumStoryMap() {
     },
     [steps]
   );
+  const currentStep = steps[stepIndex] ?? steps[0];
+  // Phase changes: reset to the first step of the selected story
+  useEffect(() => {
+    if (!ready) return;
+    setExploreMode(false);
+    setToast(null);
+    setInspect(null);
+    setStepIndex(0);
+    applyStep(0);
+  }, [applyStep, phase, ready]);
 
   // Init Mapbox
   useEffect(() => {
@@ -642,8 +659,7 @@ export default function KhartoumStoryMap() {
     }
   };
 
-  const modeLabel =
-    currentStep.actions?.mode === "post" ? "Post-conflict" : "Pre-conflict";
+  const modeLabel = phase === "post" ? "Post-conflict" : "Pre-conflict";
 
   return (
     <div

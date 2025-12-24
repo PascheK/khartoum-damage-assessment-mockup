@@ -6,6 +6,25 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import KhartoumStoryMap from "@/components/KhartoumStoryMap";
 import { PrePostMenu } from "@/components/PrePostMenu";
 import { Container } from "@/components/layout/container";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Slider } from "@/components/ui/slider";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Pie,
+  PieChart,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { BeforeAfterCompare } from "@/components/BeforeAfterCompare";
+import { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { TooltipContentProps } from "recharts/types/component/Tooltip";
 
 export default function Page() {
   const storyPinRef = useRef<HTMLDivElement | null>(null);
@@ -84,6 +103,99 @@ export default function Page() {
     return () => ctx.revert();
   }, []);
 
+  // Synchronise le menu avec la section visible (pre/post)
+  useEffect(() => {
+    const preSection = document.getElementById("pre-conflict");
+    const postSection = document.getElementById("post-conflict");
+    if (!preSection || !postSection) return;
+
+    let ticking = false;
+    // Fonction utilitaire pour détecter la section visible
+    const syncPhaseWithScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const preRect = preSection.getBoundingClientRect();
+        const postRect = postSection.getBoundingClientRect();
+        const vh = window.innerHeight;
+        // On considère la section la plus visible (milieu de l'écran)
+        const preVisible = preRect.top < vh / 2 && preRect.bottom > vh / 2;
+        const postVisible = postRect.top < vh / 2 && postRect.bottom > vh / 2;
+        if (preVisible && phase !== "pre") {
+          setPhase("pre");
+        } else if (postVisible && phase !== "post") {
+          setPhase("post");
+        }
+        ticking = false;
+      });
+    };
+
+    // IntersectionObserver pour synchro automatique (scroll naturel)
+    const handleIntersect = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          if (entry.target.id === "pre-conflict" && phase !== "pre") {
+            setPhase("pre");
+          } else if (entry.target.id === "post-conflict" && phase !== "post") {
+            setPhase("post");
+          }
+        }
+      });
+    };
+    const observer = new window.IntersectionObserver(handleIntersect, {
+      root: null,
+      threshold: 0.5, // 50% visible
+    });
+    observer.observe(preSection);
+    observer.observe(postSection);
+
+    // Ajoute un écouteur scroll pour forcer la synchro après scrollIntoView
+    window.addEventListener("scroll", syncPhaseWithScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", syncPhaseWithScroll);
+    };
+  }, [phase]);
+
+  // DATA FOR CHARTS
+  const damagedBuildings = [
+    { category: "Education", damaged: 225, undamaged: 2600 },
+    { category: "Health", damaged: 144, undamaged: 1500 },
+    { category: "Power", damaged: 13, undamaged: 57 },
+    { category: "Waste", damaged: 0, undamaged: 1 },
+    { category: "Water", damaged: 7, undamaged: 104 },
+  ];
+
+  const buildingsByCategory = [
+    {
+      category: "Education",
+      damaged: 225,
+      undamaged: 2600,
+      fill: "var(--chart-1)",
+    },
+    {
+      category: "Health",
+      damaged: 144,
+      undamaged: 1500,
+      fill: "var(--chart-2)",
+    },
+    { category: "Power", damaged: 13, undamaged: 57, fill: "var(--chart-3)" },
+    { category: "Waste", damaged: 0, undamaged: 1, fill: "var(--chart-4)" },
+    { category: "Water", damaged: 7, undamaged: 104, fill: "var(--chart-5)" },
+  ];
+
+  const chartConfig = {
+    damaged: {
+      label: "Damaged",
+      color: "var(--chart-1)",
+    },
+    undamaged: {
+      label: "Undamaged",
+      color: "var(--chart-2)",
+    },
+  } satisfies ChartConfig;
+
   return (
     <>
       {/* Landing (PDF: Title + Subtitle + Paragraph + bottom menu) */}
@@ -115,7 +227,6 @@ export default function Page() {
             </p>
           </div>
         </div>
-
       </section>
 
       {/* Section 1 — Pre-conflict: Establishing the baseline */}
@@ -181,12 +292,31 @@ export default function Page() {
               </p>
 
               <div className="mt-6 grid grid-cols-1 gap-4">
-                <div className="rounded-xl bg-gray-50 border border-black/5 h-40 flex items-center justify-center text-sm text-gray-500">
-                  Histogram (damaged + undamaged) — placeholder
-                </div>
-                <div className="rounded-xl bg-gray-50 border border-black/5 h-40 flex items-center justify-center text-sm text-gray-500">
-                  Chart: all buildings by category — placeholder
-                </div>
+                <ChartContainer config={chartConfig}>
+                  <BarChart accessibilityLayer data={damagedBuildings}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="category"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={true}
+                    />
+                    <YAxis
+                      tickFormatter={(value) =>
+                        new Intl.NumberFormat("en-US", {
+                          notation: "compact",
+                          compactDisplay: "short",
+                        }).format(value)
+                      }
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={DamageTooltip}
+                    />
+                    <Bar dataKey="damaged" fill="var(--chart-1)"></Bar>
+                    <Bar dataKey="undamaged" fill="var(--chart-2)"></Bar>
+                  </BarChart>
+                </ChartContainer>
               </div>
             </div>
 
@@ -272,8 +402,14 @@ export default function Page() {
                   </button>
                 </div>
 
-                <div className="mt-6 rounded-xl bg-gray-50 border border-black/5 h-44 flex items-center justify-center text-sm text-gray-500">
-                  Before/After comparison slider — placeholder
+                <div className="mt-6">
+                  <BeforeAfterCompare
+                    beforeSrc="https://picsum.photos/200"
+                    afterSrc="https://picsum.photos/200"
+                    beforeLabel="Before"
+                    afterLabel="After"
+                    alt="Satellite imagery comparison"
+                  />
                 </div>
               </div>
 
@@ -363,12 +499,17 @@ export default function Page() {
               <h3 className="text-lg font-semibold text-gray-900">
                 Damaged buildings by category
               </h3>
-              <p className="mt-2 text-sm text-gray-600">
-                Pie chart — placeholder
-              </p>
-              <div className="mt-6 rounded-xl bg-gray-50 border border-black/5 h-56 flex items-center justify-center text-sm text-gray-500">
-                Pie chart (damaged by category) — placeholder
-              </div>
+              <ChartContainer config={chartConfig}>
+                <PieChart>
+                  <ChartTooltip content={DamageTooltip} />
+                  <Pie
+                    data={buildingsByCategory}
+                    dataKey="damaged"
+                    label
+                    nameKey="category"
+                  />
+                </PieChart>
+              </ChartContainer>
             </div>
           </div>
         </Container>
@@ -388,4 +529,33 @@ export default function Page() {
       <PrePostMenu value={phase} onChange={handlePhaseChange} />
     </>
   );
+}
+
+export function DamageTooltip(props: TooltipContentProps<ValueType, NameType>) {
+  const { active, payload } = props as TooltipContentProps<ValueType, NameType>;
+  if (!active || !payload?.length) return null;
+
+  const p = payload[0].payload as {
+    category: string;
+    damaged: number;
+    undamaged: number;
+  };
+
+  const ratio = calculateDamageRatio(p.damaged, p.undamaged);
+  const total = p.damaged + p.undamaged;
+
+  return (
+    <div className="rounded-lg border bg-foreground p-2 text-sm shadow">
+      <div className="font-medium text-white">{p.category}</div>
+      <div className="mt-2 font-semibold text-white">
+       {p.damaged} ({(ratio * 100).toFixed(1)}%)
+      </div>
+    </div>
+  );
+}
+
+function calculateDamageRatio(damaged: number, undamaged: number) {
+  const total = damaged + undamaged;
+  if (total === 0) return 0;
+  return damaged / total;
 }

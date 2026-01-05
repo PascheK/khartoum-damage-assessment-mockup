@@ -57,7 +57,7 @@ export default function Page() {
       // Keep the Mapbox visual element at a constant (large) size and animate scale only.
       // This avoids tile reload/flicker from width/height animations.
       gsap.set(visualEl, {
-        scale: 0.67, // 60vh / 90vh ≈ 0.666
+        scale: 0.8, // 60vh / 90vh ≈ 0.666
         borderRadius: 16,
         boxShadow: "0 0px 0px rgba(0,0,0,0)",
         willChange: "transform",
@@ -91,7 +91,7 @@ export default function Page() {
       tl.to(
         visualEl,
         {
-          scale: 0.67,
+          scale: 0.8,
           borderRadius: 16,
           boxShadow: "0 0px 0px rgba(0,0,0,0)",
           ease: "none",
@@ -201,7 +201,7 @@ export default function Page() {
       {/* Landing (PDF: Title + Subtitle + Paragraph + bottom menu) */}
       <section
         id="top"
-        className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4"
+        className="relative min-h-screen flex items-center justify-center bg-gray-50 px-4"
       >
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 tracking-tight">
@@ -271,7 +271,7 @@ export default function Page() {
                 ref={storyVisualRef}
                 className="w-[90vw] h-[90vh] rounded-2xl overflow-hidden bg-gray-200"
               >
-                <KhartoumStoryMap phase={phase} />
+                <KhartoumStoryMap />
               </div>
             </div>
           </div>
@@ -287,7 +287,7 @@ export default function Page() {
               </h3>
               <p className="mt-2 text-sm text-gray-600">
                 Before conflict strikes, we rely on open-source data to
-                understand what's at risk. Using building footprints and
+                understand what&apos;s at risk. Using building footprints and
                 open-source data, we can classify critical infrastructure.
               </p>
 
@@ -382,53 +382,20 @@ export default function Page() {
               </p>
             </div>
 
-            <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="mt-10 grid grid-cols-1 gap-8">
               {/* Controls placeholder */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Interactivity
+                  <h3 className="text-lg font-semibold text-gray-900">
+                  Satellite imagery
                 </h3>
-                <p className="mt-2 text-sm text-gray-600">
-                  Zoom to Hospital and School. Show before/after satellite
-                  imagery.
-                </p>
-
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <button className="px-4 py-2 rounded-full text-sm font-semibold border border-black/10 bg-white hover:bg-gray-50">
-                    Zoom to Hospital
-                  </button>
-                  <button className="px-4 py-2 rounded-full text-sm font-semibold border border-black/10 bg-white hover:bg-gray-50">
-                    Zoom to School
-                  </button>
-                </div>
-
                 <div className="mt-6">
                   <BeforeAfterCompare
-                    beforeSrc="https://picsum.photos/200"
-                    afterSrc="https://picsum.photos/200"
+                    beforeSrc="https://picsum.photos/1920"
+                    afterSrc="https://picsum.photos/1920"
                     beforeLabel="Before"
                     afterLabel="After"
                     alt="Satellite imagery comparison"
                   />
-                </div>
-              </div>
-
-              {/* Imagery placeholders */}
-              <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Satellite imagery
-                </h3>
-                <p className="mt-2 text-sm text-gray-600">
-                  Use two frames (before / after) or a draggable divider.
-                </p>
-
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-gray-50 border border-black/5 h-44 flex items-center justify-center text-sm text-gray-500">
-                    Before — placeholder
-                  </div>
-                  <div className="rounded-xl bg-gray-50 border border-black/5 h-44 flex items-center justify-center text-sm text-gray-500">
-                    After — placeholder
-                  </div>
                 </div>
               </div>
             </div>

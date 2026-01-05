@@ -54,11 +54,7 @@ function buildFilter(categories?: string[], statuses?: string[]) {
   return clauses.length === 1 ? null : clauses;
 }
 
-export default function KhartoumStoryMap({
-  phase = "pre",
-}: {
-  phase?: "pre" | "post";
-}) {
+export default function KhartoumStoryMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -69,7 +65,7 @@ export default function KhartoumStoryMap({
   const [ready, setReady] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [exploreMode, setExploreMode] = useState(false);
-
+  const [phase, setPhase] = useState<"pre" | "post">("pre");
   const [toast, setToast] = useState<{ title: string; body: string } | null>(
     null
   );
@@ -87,7 +83,7 @@ export default function KhartoumStoryMap({
           body: "Overview of the built environment. Use Next/Previous to follow the story.",
           camera: {
             center: [32.55, 15.51666667],
-            zoom: 16.8,
+            zoom: 15,
             pitch: 55,
             bearing: -15,
             durationMs: 1500,
@@ -346,7 +342,9 @@ export default function KhartoumStoryMap({
           showLandmarkIconLabels: false,
         },
       },
-      zoom: 18,
+      zoom: 15,
+      minZoom: 14,
+      maxZoom: 17,
       center: [32.55, 15.51666667],
       pitch: 60,
       antialias: true,
@@ -659,6 +657,11 @@ export default function KhartoumStoryMap({
     }
   };
 
+  const changePhase = () => {
+    setPhase((p) => (p === "pre" ? "post" : "pre"));
+    resetSelection();
+  };
+
   const modeLabel = phase === "post" ? "Post-conflict" : "Pre-conflict";
 
   return (
@@ -689,6 +692,13 @@ export default function KhartoumStoryMap({
           title="Clear selection"
         >
           Clear
+        </button>
+        <button
+          onClick={changePhase}
+          className="px-3 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-xs font-medium hover:bg-white"
+          title="Clear selection"
+        >
+          Change to {phase === "pre" ? "post-conflict" : "pre-conflict"}
         </button>
       </div>
 
@@ -756,7 +766,7 @@ export default function KhartoumStoryMap({
       )}
 
       {/* Bottom-center story controls (discreet/minimal) */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20">
         <div className="flex items-center gap-2 px-2 py-2 rounded-full bg-white/75 backdrop-blur border border-black/10 shadow-sm">
           <button
             onClick={goPrev}

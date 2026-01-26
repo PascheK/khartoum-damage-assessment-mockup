@@ -216,6 +216,32 @@ export default function KhartoumStoryMap() {
           },
         },
       ] as Step[],
+      pre: [
+        {
+          id: "pre-start",
+          title: "Pre-conflict Start",
+          body: "View of whole Khartoum area before conflict",
+          camera: {
+            center: [32.55, 15.51666667],
+            zoom: 15.0,
+            pitch: 60,
+            bearing: 0,
+            durationMs: 1700,
+          },
+          actions: {
+            mode: "pre",
+            categories: undefined,
+            statuses: undefined,
+            heightScale: 1.0,
+            outlineDamaged: false,
+            popup: {
+              title: "Pre-conflict · Initial view",
+              body: "Overview of the whole Khartoum area before conflict.",
+            },
+          },
+        },
+        // Add more steps for 'pre' as needed
+      ] as Step[],
     }),
     []
   );

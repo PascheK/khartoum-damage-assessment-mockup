@@ -65,7 +65,7 @@ export default function KhartoumStoryMap() {
   const [ready, setReady] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [exploreMode, setExploreMode] = useState(false);
-  const [phase, setPhase] = useState<"pre" | "post">("pre");
+  const [phase] = useState<"pre" | "post">("post");
   const [toast, setToast] = useState<{ title: string; body: string } | null>(
     null
   );
@@ -657,12 +657,23 @@ export default function KhartoumStoryMap() {
     }
   };
 
-  const changePhase = () => {
-    setPhase((p) => (p === "pre" ? "post" : "pre"));
-    resetSelection();
-  };
-
   const modeLabel = phase === "post" ? "Post-conflict" : "Pre-conflict";
+
+  // Legend data
+  const legends = [
+    { category: "building", label: "Building", color: "#ff2f00", status: "damaged" },
+    { category: "building", label: "Building", color: "#ffffff", status: "undamaged" },
+    { category: "building", label: "Building", color: "#ededed", status: "unknown" },
+    { category: "education", label: "Education", color: "#00a83c", status: "damaged" },
+    { category: "education", label: "Education", color: "#00d24d", status: "undamaged" },
+    { category: "health", label: "Health", color: "#ff7f00", status: "damaged" },
+    { category: "health", label: "Health", color: "#ffd200", status: "undamaged" },
+    { category: "power", label: "Power", color: "#ff9900", status: "damaged" },
+    { category: "power", label: "Power", color: "#ffd640", status: "undamaged" },
+    { category: "waste", label: "Waste", color: "#b0724f", status: "all" },
+    { category: "water", label: "Water", color: "#00b7ff", status: "damaged" },
+    { category: "water", label: "Water", color: "#0099ff", status: "undamaged" },
+  ];
 
   return (
     <div
@@ -693,13 +704,6 @@ export default function KhartoumStoryMap() {
         >
           Clear
         </button>
-        <button
-          onClick={changePhase}
-          className="px-3 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-xs font-medium hover:bg-white"
-          title="Clear selection"
-        >
-          Change to {phase === "pre" ? "post-conflict" : "pre-conflict"}
-        </button>
       </div>
 
       {/* Fullscreen button */}
@@ -712,7 +716,7 @@ export default function KhartoumStoryMap() {
 
       {/* Right narrative panel (minimal, no component abstraction) */}
       <div className="absolute right-4 top-16 z-20 w-[320px] max-w-[85vw] hidden md:block">
-        <div className="rounded-2xl bg-white/85 backdrop-blur border border-black/10 shadow-sm p-4">
+        <div className="rounded-2xl bg-white/85 backdrop-blur border border-black/10 shadow-sm p-4 max-h-[70vh] overflow-y-auto">
           <div className="text-xs uppercase tracking-wide text-black/60">
             Story
           </div>
@@ -722,6 +726,37 @@ export default function KhartoumStoryMap() {
           <p className="mt-2 text-sm text-black/80 leading-relaxed">
             {currentStep.body}
           </p>
+
+          {/* Legend table */}
+          <div className="mt-4 border-t border-black/10 pt-3">
+            <div className="text-xs uppercase tracking-wide text-black/60 font-semibold">
+              Map Legend
+            </div>
+            <div className="mt-3 space-y-2">
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="font-semibold text-black/70">Category</div>
+                <div className="font-semibold text-black/70">Status</div>
+                <div className="font-semibold text-black/70">Color</div>
+              </div>
+              {legends.map((leg, idx) => (
+                <div key={idx} className="grid grid-cols-3 gap-2 items-center text-xs">
+                  <div className="text-black/80 truncate">{leg.label}</div>
+                  <div className="text-black/80 capitalize">
+                    {leg.status === "all" ? "—" : leg.status}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded border border-black/20"
+                      style={{ backgroundColor: leg.color }}
+                    />
+                    <span className="text-black/60 font-mono text-[10px]">
+                      {leg.color}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {inspect && (
             <div className="mt-4 border-t border-black/10 pt-3">

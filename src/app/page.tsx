@@ -23,7 +23,10 @@ import {
   YAxis,
 } from "recharts";
 import { BeforeAfterCompare } from "@/components/BeforeAfterCompare";
-import { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import {
+  ValueType,
+  NameType,
+} from "recharts/types/component/DefaultTooltipContent";
 import type { TooltipContentProps } from "recharts/types/component/Tooltip";
 
 export default function Page() {
@@ -49,7 +52,7 @@ export default function Page() {
     if (!pinEl || !visualEl) return;
 
     const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
     if (reduce) return;
 
@@ -84,7 +87,7 @@ export default function Page() {
           boxShadow: "0 30px 90px rgba(0,0,0,0.25)",
           ease: "none",
         },
-        0
+        0,
       );
 
       // Zoom OUT
@@ -96,7 +99,7 @@ export default function Page() {
           boxShadow: "0 0px 0px rgba(0,0,0,0)",
           ease: "none",
         },
-        0.65
+        0.65,
       );
     }, pinEl);
 
@@ -160,8 +163,8 @@ export default function Page() {
 
   // DATA FOR CHARTS
   const damagedBuildings = [
-    { category: "Education", damaged: 225, undamaged: 2600 },
-    { category: "Health", damaged: 144, undamaged: 1500 },
+    { category: "Education", damaged: 225, undamaged: 2608 },
+    { category: "Health", damaged: 144, undamaged: 1528 },
     { category: "Power", damaged: 13, undamaged: 57 },
     { category: "Waste", damaged: 0, undamaged: 1 },
     { category: "Water", damaged: 7, undamaged: 104 },
@@ -171,18 +174,18 @@ export default function Page() {
     {
       category: "Education",
       damaged: 225,
-      undamaged: 2600,
+      undamaged: 389,
       fill: "var(--chart-1)",
     },
     {
       category: "Health",
       damaged: 144,
-      undamaged: 1500,
+      undamaged: 389,
       fill: "var(--chart-2)",
     },
-    { category: "Power", damaged: 13, undamaged: 57, fill: "var(--chart-3)" },
-    { category: "Waste", damaged: 0, undamaged: 1, fill: "var(--chart-4)" },
-    { category: "Water", damaged: 7, undamaged: 104, fill: "var(--chart-5)" },
+    { category: "Power", damaged: 13, undamaged: 389, fill: "var(--chart-3)" },
+    { category: "Waste", damaged: 0, undamaged: 389, fill: "var(--chart-4)" },
+    { category: "Water", damaged: 7, undamaged: 389, fill: "var(--chart-5)" },
   ];
 
   const chartConfig = {
@@ -309,10 +312,7 @@ export default function Page() {
                         }).format(value)
                       }
                     />
-                    <ChartTooltip
-                      cursor={false}
-                      content={DamageTooltip}
-                    />
+                    <ChartTooltip cursor={false} content={DamageTooltip} />
                     <Bar dataKey="damaged" fill="var(--chart-1)"></Bar>
                     <Bar dataKey="undamaged" fill="var(--chart-2)"></Bar>
                   </BarChart>
@@ -385,13 +385,30 @@ export default function Page() {
             <div className="mt-10 grid grid-cols-1 gap-8">
               {/* Controls placeholder */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-900">
                   Satellite imagery
                 </h3>
                 <div className="mt-6">
                   <BeforeAfterCompare
-                    beforeSrc="https://picsum.photos/1920"
-                    afterSrc="https://picsum.photos/1920"
+                    beforeSrc="/images/hospital_before.jpg"
+                    afterSrc="/images/hospital_after.jpg"
+                    beforeLabel="Before"
+                    afterLabel="After"
+                    alt="Satellite imagery comparison"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="mt-10 grid grid-cols-1 gap-8">
+              {/* Controls placeholder */}
+              <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Satellite imagery
+                </h3>
+                <div className="mt-6">
+                  <BeforeAfterCompare
+                    beforeSrc="/images/school_before.jpg"
+                    afterSrc="/images/school_after.jpg"
                     beforeLabel="Before"
                     afterLabel="After"
                     alt="Satellite imagery comparison"
@@ -435,7 +452,7 @@ export default function Page() {
                   Scale
                 </div>
                 <div className="mt-2 text-3xl font-bold text-gray-900">
-                  ~250’000
+                  256,123
                 </div>
                 <div className="mt-1 text-sm text-gray-600">
                   Buildings analysed
@@ -446,18 +463,19 @@ export default function Page() {
                   Critical
                 </div>
                 <div className="mt-2 text-3xl font-bold text-gray-900">
-                  ~6’000
+                  4,687
                 </div>
                 <div className="mt-1 text-sm text-gray-600">
-                  Critical infrastructure
+                  infrastructure identified
                 </div>
               </div>
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
                 <div className="text-xs uppercase tracking-wide text-gray-500">
-                  Interactivity
+                  Critical
                 </div>
-                <div className="mt-4 rounded-xl bg-gray-50 border border-black/5 h-24 flex items-center justify-center text-sm text-gray-500">
-                  Export / actions — placeholder
+                <div className="mt-2 text-3xl font-bold text-gray-900">389</div>
+                <div className="mt-1 text-sm text-gray-600">
+                  infrastructure damaged
                 </div>
               </div>
             </div>
@@ -509,20 +527,18 @@ export function DamageTooltip(props: TooltipContentProps<ValueType, NameType>) {
   };
 
   const ratio = calculateDamageRatio(p.damaged, p.undamaged);
-  const total = p.damaged + p.undamaged;
 
   return (
     <div className="rounded-lg border bg-foreground p-2 text-sm shadow">
       <div className="font-medium text-white">{p.category}</div>
       <div className="mt-2 font-semibold text-white">
-       {p.damaged} ({(ratio * 100).toFixed(1)}%)
+        {p.damaged} ({(ratio * 100).toFixed(1)}%)
       </div>
     </div>
   );
 }
 
-function calculateDamageRatio(damaged: number, undamaged: number) {
-  const total = damaged + undamaged;
+function calculateDamageRatio(damaged: number, total: number) {
   if (total === 0) return 0;
   return damaged / total;
 }

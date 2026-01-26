@@ -386,7 +386,7 @@ export default function Page() {
               {/* Controls placeholder */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Satellite imagery
+                  Satellite imagery of hospital
                 </h3>
                 <div className="mt-6">
                   <BeforeAfterCompare
@@ -403,7 +403,7 @@ export default function Page() {
               {/* Controls placeholder */}
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Satellite imagery
+                  Satellite imagery of school
                 </h3>
                 <div className="mt-6">
                   <BeforeAfterCompare

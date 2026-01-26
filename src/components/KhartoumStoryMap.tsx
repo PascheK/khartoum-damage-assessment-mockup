@@ -76,64 +76,62 @@ export default function KhartoumStoryMap() {
 
   const stories = useMemo(
     () => ({
-      pre: [
+      post: [
         {
-          id: "baseline",
-          title: "Establishing the baseline",
-          body: "Overview of the built environment. Use Next/Previous to follow the story.",
+          id: "start",
+          title: "Start",
+          body: "View of whole Khartoum area",
           camera: {
             center: [32.55, 15.51666667],
-            zoom: 15,
-            pitch: 55,
-            bearing: -15,
-            durationMs: 1500,
+            zoom: 15.0,
+            pitch: 60,
+            bearing: 0,
+            durationMs: 1700,
           },
           actions: {
-            mode: "pre",
+            mode: "post",
             categories: undefined,
             statuses: undefined,
-            heightScale: 1,
-            outlineDamaged: false,
+            heightScale: 1.0,
+            outlineDamaged: true,
             popup: {
-              title: "Step 1 · Baseline",
-              body: "We start with a broad view before focusing on specific infrastructure.",
+              title: "Start · Initial view",
+              body: "Overview of the whole Khartoum area.",
             },
           },
         },
         {
           id: "categories",
-          title: "Critical infrastructure categories",
-          body: "Highlight key categories (education, health, water, power…). This is a baseline classification.",
+          title: "Categories of buildings",
+          body: "Zoom to area showing different building categories",
           camera: {
-            center: [32.55, 15.51666667],
-            zoom: 17.3,
+            center: [35.5394, 15.3910],
+            zoom: 17.5,
             pitch: 60,
-            bearing: 20,
-            durationMs: 1500,
+            bearing: 0,
+            durationMs: 1700,
           },
           actions: {
-            mode: "pre",
-            categories: ["education", "health", "water", "power"],
+            mode: "post",
+            categories: undefined,
             statuses: undefined,
-            heightScale: 1,
-            outlineDamaged: false,
+            heightScale: 1.0,
+            outlineDamaged: true,
             popup: {
-              title: "Step 2 · Categories",
-              body: "We filter the map to focus on critical infrastructure categories.",
+              title: "Step 2 · Categories of buildings",
+              body: "Exploring different categories of buildings in this area.",
             },
           },
         },
-      ] as Step[],
-      post: [
         {
           id: "damage-overview",
-          title: "Assessing damage (overview)",
-          body: "Switch to a post-conflict lens. Damaged features are emphasized for quick scanning.",
+          title: "Damage Overview",
+          body: "Same area but filter out undamaged buildings",
           camera: {
-            center: [32.55, 15.51666667],
-            zoom: 17.0,
+            center: [35.5394, 15.3910],
+            zoom: 17.5,
             pitch: 60,
-            bearing: -35,
+            bearing: 0,
             durationMs: 1700,
           },
           actions: {
@@ -143,40 +141,17 @@ export default function KhartoumStoryMap() {
             heightScale: 1.2,
             outlineDamaged: true,
             popup: {
-              title: "Step 1 · Damage overview",
+              title: "Step 3 · Damage overview",
               body: "Damaged buildings are filtered and outlined to support rapid assessment.",
             },
           },
         },
         {
-          id: "hospital",
-          title: "Case focus: Hospital",
-          body: "Zoom into a health facility area. Click buildings to inspect attributes.",
-          camera: {
-            center: [32.5532, 15.5159],
-            zoom: 18.6,
-            pitch: 65,
-            bearing: 10,
-            durationMs: 1700,
-          },
-          actions: {
-            mode: "post",
-            categories: ["health"],
-            statuses: ["damaged", "undamaged", "unknown"],
-            heightScale: 1.25,
-            outlineDamaged: true,
-            popup: {
-              title: "Step 2 · Hospital focus",
-              body: "We focus on health infrastructure for situational awareness.",
-            },
-          },
-        },
-        {
           id: "school",
-          title: "Case focus: School",
-          body: "Zoom into an education facility area. Height scale can be used as emphasis for storytelling.",
+          title: "School",
+          body: "Zoom into an education facility area",
           camera: {
-            center: [32.5489, 15.5182],
+            center: [32.5322, 15.5276],
             zoom: 18.5,
             pitch: 65,
             bearing: -20,
@@ -189,8 +164,31 @@ export default function KhartoumStoryMap() {
             heightScale: 1.35,
             outlineDamaged: true,
             popup: {
-              title: "Step 3 · School focus",
+              title: "Step 4 · School focus",
               body: "Education sites can be spotlighted for recovery planning priorities.",
+            },
+          },
+        },
+        {
+          id: "hospital",
+          title: "Hospital",
+          body: "Zoom into a health facility area",
+          camera: {
+            center: [32.5325, 15.5977],
+            zoom: 18.6,
+            pitch: 65,
+            bearing: 10,
+            durationMs: 1700,
+          },
+          actions: {
+            mode: "post",
+            categories: ["health"],
+            statuses: ["damaged", "undamaged", "unknown"],
+            heightScale: 1.25,
+            outlineDamaged: true,
+            popup: {
+              title: "Step 5 · Hospital focus",
+              body: "We focus on health infrastructure for situational awareness.",
             },
           },
         },
@@ -200,9 +198,9 @@ export default function KhartoumStoryMap() {
           body: "Return to a broader view to support reconstruction planning and prioritization.",
           camera: {
             center: [32.55, 15.51666667],
-            zoom: 16.9,
-            pitch: 55,
-            bearing: 25,
+            zoom: 15.0,
+            pitch: 60,
+            bearing: 0,
             durationMs: 1700,
           },
           actions: {
@@ -212,31 +210,8 @@ export default function KhartoumStoryMap() {
             heightScale: 1.1,
             outlineDamaged: true,
             popup: {
-              title: "Step 4 · Recovery planning",
+              title: "Step 6 · Recovery planning",
               body: "Broader overview helps compare categories and identify priority clusters.",
-            },
-          },
-        },
-        {
-          id: "explore",
-          title: "Explore mode",
-          body: "You can now explore freely. Use the toggle to lock back into story mode anytime.",
-          camera: {
-            center: [32.55, 15.51666667],
-            zoom: 17.2,
-            pitch: 58,
-            bearing: 0,
-            durationMs: 1200,
-          },
-          actions: {
-            mode: "post",
-            categories: undefined,
-            statuses: undefined,
-            heightScale: 1,
-            outlineDamaged: true,
-            popup: {
-              title: "Step 5 · Explore",
-              body: "Story steps are finished—feel free to inspect buildings and navigate freely.",
             },
           },
         },
@@ -685,9 +660,6 @@ export default function KhartoumStoryMap() {
 
       {/* Top bar (minimal) */}
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-        <div className="px-3 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-xs font-medium">
-          {modeLabel} · Step {stepIndex + 1}/{steps.length}
-        </div>
 
         <button
           onClick={() => setExploreMode((v) => !v)}

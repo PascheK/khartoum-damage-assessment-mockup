@@ -260,67 +260,29 @@ export default function Page() {
           </div>
         </Container>
 
-        {/* Story Map (pinned + zoom) */}
-        <div
-          ref={storyPinRef}
-          className="mt-10 min-h-screen flex items-center justify-center px-4"
-        >
-          {/* Layout frame keeps page flow stable */}
-          <div className="relative w-full max-w-6xl h-[60vh] max-h-[700px]">
-            {/* Centered host (doesn't affect layout) */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              {/* Visual element stays big; GSAP animates its scale */}
-              <div
-                ref={storyVisualRef}
-                className="w-[90vw] h-[90vh] rounded-2xl overflow-hidden bg-gray-200"
-              >
-                <KhartoumStoryMap />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Pre-conflict content blocks: charts + partnerships */}
+        {/* Pre-conflict content blocks: statistics + partnerships */}
         <Container>
-          <div className="max-w-6xl mx-auto mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Charts placeholder */}
+          <div className="max-w-6xl mx-auto mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Critical buildings identified
-              </h3>
-              <p className="mt-2 text-sm text-gray-600">
-                Before conflict strikes, we rely on open-source data to
-                understand what&apos;s at risk. Using building footprints and
-                open-source data, we can classify critical infrastructure.
-              </p>
-
-              <div className="mt-6 grid grid-cols-1 gap-4">
-                <ChartContainer config={chartConfig}>
-                  <BarChart accessibilityLayer data={damagedBuildings}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                      dataKey="category"
-                      tickLine={false}
-                      tickMargin={10}
-                      axisLine={true}
-                    />
-                    <YAxis
-                      tickFormatter={(value) =>
-                        new Intl.NumberFormat("en-US", {
-                          notation: "compact",
-                          compactDisplay: "short",
-                        }).format(value)
-                      }
-                    />
-                    <ChartTooltip cursor={false} content={DamageTooltip} />
-                    <Bar dataKey="damaged" fill="var(--chart-1)"></Bar>
-                    <Bar dataKey="undamaged" fill="var(--chart-2)"></Bar>
-                  </BarChart>
-                </ChartContainer>
+              <div className="text-xs uppercase tracking-wide text-gray-500">
+                Scale
+              </div>
+              <div className="mt-2 text-3xl font-bold text-gray-900">
+                256,123
+              </div>
+              <div className="mt-1 text-sm text-gray-600">
+                Buildings analysed
               </div>
             </div>
-
-            {/* Partnerships */}
+            <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+              <div className="text-xs uppercase tracking-wide text-gray-500">
+                Critical
+              </div>
+              <div className="mt-2 text-3xl font-bold text-gray-900">4,687</div>
+              <div className="mt-1 text-sm text-gray-600">
+                Critical infrastructures identified
+              </div>
+            </div>
             <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900">
                 Partnerships
@@ -356,6 +318,47 @@ export default function Page() {
             </div>
           </div>
         </Container>
+
+        {/* Pre-conflict content blocks: critical buildings chart */}
+        <Container>
+          <div className="max-w-6xl mx-auto mt-10 grid grid-cols-1">
+            <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Critical buildings identified
+              </h3>
+              <p className="mt-2 text-sm text-gray-600">
+                Before conflict strikes, we rely on open-source data to
+                understand what&apos;s at risk. Using building footprints and
+                open-source data, we can classify critical infrastructure.
+              </p>
+
+              <div className="mt-6 grid grid-cols-1 gap-4">
+                <ChartContainer config={chartConfig}>
+                  <BarChart accessibilityLayer data={damagedBuildings}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="category"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={true}
+                    />
+                    <YAxis
+                      tickFormatter={(value) =>
+                        new Intl.NumberFormat("en-US", {
+                          notation: "compact",
+                          compactDisplay: "short",
+                        }).format(value)
+                      }
+                    />
+                    <ChartTooltip cursor={false} content={DamageTooltip} />
+                    <Bar dataKey="damaged" fill="var(--chart-1)"></Bar>
+                    <Bar dataKey="undamaged" fill="var(--chart-2)"></Bar>
+                  </BarChart>
+                </ChartContainer>
+              </div>
+            </div>
+          </div>
+        </Container>
       </section>
 
       {/* Section 2a — Post-conflict: Assessing the damage */}
@@ -378,7 +381,9 @@ export default function Page() {
                 such as urban environments. With remote sensing data, we provide
                 a 'watchtower' view, tracking damages remotely. Using the power
                 of AI, we can help assess what changed, where and to what
-                extent.
+                extent. Here are concrete examples of visible damages to
+                critical infrastructures identified through geospatial
+                intelligence.
               </p>
             </div>
 
@@ -392,8 +397,8 @@ export default function Page() {
                   <BeforeAfterCompare
                     beforeSrc="/images/hospital_before.jpg"
                     afterSrc="/images/hospital_after.jpg"
-                    beforeLabel="Before"
-                    afterLabel="After"
+                    beforeLabel="2023"
+                    afterLabel="2025"
                     alt="Satellite imagery comparison"
                   />
                 </div>
@@ -409,8 +414,8 @@ export default function Page() {
                   <BeforeAfterCompare
                     beforeSrc="/images/school_before.jpg"
                     afterSrc="/images/school_after.jpg"
-                    beforeLabel="Before"
-                    afterLabel="After"
+                    beforeLabel="2023"
+                    afterLabel="2025"
                     alt="Satellite imagery comparison"
                   />
                 </div>
@@ -437,38 +442,16 @@ export default function Page() {
               <p className="mt-6 text-gray-700 leading-relaxed">
                 By visualizing critical damaged infrastructures, prioritization
                 and recovery of essential services become possible. In Khartoum,
-                nearly 250’000 buildings were analysed, and around 6000 of them
-                were categorised as critical infrastructure. AI-assisted
-                analysis helps focus the attention on key areas and
-                infrastructures. Urgent reconstruction needs become easily
-                identifiable. Teams can then go on the ground to confirm the
-                damages and provide expert recommendations for interventions.
+                out of the 4687 critical infrastructures identified, 389 were
+                identified as damaged through remote analysis. AI-assisted
+                analysis helps focus the attention and facilitates the
+                identification of urgent reconstruction needs. Teams can then go
+                on the ground to confirm the damages and provide expert
+                recommendations for interventions.
               </p>
             </div>
 
-            <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-                <div className="text-xs uppercase tracking-wide text-gray-500">
-                  Scale
-                </div>
-                <div className="mt-2 text-3xl font-bold text-gray-900">
-                  256,123
-                </div>
-                <div className="mt-1 text-sm text-gray-600">
-                  Buildings analysed
-                </div>
-              </div>
-              <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-                <div className="text-xs uppercase tracking-wide text-gray-500">
-                  Critical
-                </div>
-                <div className="mt-2 text-3xl font-bold text-gray-900">
-                  4,687
-                </div>
-                <div className="mt-1 text-sm text-gray-600">
-                  infrastructure identified
-                </div>
-              </div>
+            <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
                 <div className="text-xs uppercase tracking-wide text-gray-500">
                   Critical
@@ -478,23 +461,41 @@ export default function Page() {
                   infrastructure damaged
                 </div>
               </div>
+              <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Damaged buildings by category
+                </h3>
+                <ChartContainer config={chartConfig}>
+                  <PieChart>
+                    <ChartTooltip content={DamageTooltip} />
+                    <Pie
+                      data={buildingsByCategory}
+                      dataKey="damaged"
+                      label
+                      nameKey="category"
+                    />
+                  </PieChart>
+                </ChartContainer>
+              </div>
             </div>
-
-            <div className="mt-8 rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Damaged buildings by category
-              </h3>
-              <ChartContainer config={chartConfig}>
-                <PieChart>
-                  <ChartTooltip content={DamageTooltip} />
-                  <Pie
-                    data={buildingsByCategory}
-                    dataKey="damaged"
-                    label
-                    nameKey="category"
-                  />
-                </PieChart>
-              </ChartContainer>
+            {/* Story Map (pinned + zoom) */}
+            <div
+              ref={storyPinRef}
+              className="mt-10 min-h-screen flex items-center justify-center px-4"
+            >
+              {/* Layout frame keeps page flow stable */}
+              <div className="relative w-full max-w-6xl h-[60vh] max-h-[700px]">
+                {/* Centered host (doesn't affect layout) */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                  {/* Visual element stays big; GSAP animates its scale */}
+                  <div
+                    ref={storyVisualRef}
+                    className="w-[90vw] h-[90vh] rounded-2xl overflow-hidden bg-gray-200"
+                  >
+                    <KhartoumStoryMap />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </Container>

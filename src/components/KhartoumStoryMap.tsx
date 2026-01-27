@@ -67,12 +67,19 @@ export default function KhartoumStoryMap() {
   const [exploreMode, setExploreMode] = useState(false);
   const [phase] = useState<"pre" | "post">("post");
   const [toast, setToast] = useState<{ title: string; body: string } | null>(
-    null
+    null,
   );
   const [inspect, setInspect] = useState<{
     title: string;
     lines: string[];
   } | null>(null);
+  const [showCameraInfo, setShowCameraInfo] = useState(false);
+  const [cameraLive, setCameraLive] = useState({
+    center: [32.55, 15.51666667] as [number, number],
+    zoom: 15,
+    pitch: 60,
+    bearing: 0,
+  });
 
   const stories = useMemo(
     () => ({
@@ -105,10 +112,10 @@ export default function KhartoumStoryMap() {
           title: "Categories of buildings",
           body: "Zoom to area showing different building categories",
           camera: {
-            center: [35.5394, 15.3910],
-            zoom: 17.5,
-            pitch: 60,
-            bearing: 0,
+            center: [32.540137, 15.561978],
+            zoom: 14.25,
+            pitch: 59.5,
+            bearing: -11.2,
             durationMs: 1700,
           },
           actions: {
@@ -128,10 +135,10 @@ export default function KhartoumStoryMap() {
           title: "Damage Overview",
           body: "Same area but filter out undamaged buildings",
           camera: {
-            center: [35.5394, 15.3910],
-            zoom: 17.5,
-            pitch: 60,
-            bearing: 0,
+            center: [32.540137, 15.561978],
+            zoom: 14.25,
+            pitch: 59.5,
+            bearing: -11.2,
             durationMs: 1700,
           },
           actions: {
@@ -243,7 +250,7 @@ export default function KhartoumStoryMap() {
         // Add more steps for 'pre' as needed
       ] as Step[],
     }),
-    []
+    [],
   );
 
   const steps = phase === "post" ? stories.post : stories.pre;
@@ -294,7 +301,7 @@ export default function KhartoumStoryMap() {
         map.setLayoutProperty(
           OUTLINE_ID,
           "visibility",
-          s.actions?.outlineDamaged ? "visible" : "none"
+          s.actions?.outlineDamaged ? "visible" : "none",
         );
       }
 
@@ -305,7 +312,7 @@ export default function KhartoumStoryMap() {
       // Clear inspect on step change (optional)
       setInspect(null);
     },
-    [steps]
+    [steps],
   );
   const currentStep = steps[stepIndex] ?? steps[0];
   // Phase changes: reset to the first step of the selected story
@@ -506,7 +513,7 @@ export default function KhartoumStoryMap() {
                 sourceLayer: SOURCE_LAYER,
                 id: hoveredIdRef.current as any,
               },
-              { hover: false }
+              { hover: false },
             );
           } catch {}
         }
@@ -517,7 +524,7 @@ export default function KhartoumStoryMap() {
           try {
             map.setFeatureState(
               { source: SOURCE_ID, sourceLayer: SOURCE_LAYER, id: id as any },
-              { hover: true }
+              { hover: true },
             );
           } catch {}
         }
@@ -533,7 +540,7 @@ export default function KhartoumStoryMap() {
                 sourceLayer: SOURCE_LAYER,
                 id: hoveredIdRef.current as any,
               },
-              { hover: false }
+              { hover: false },
             );
           } catch {}
         }
@@ -577,6 +584,38 @@ export default function KhartoumStoryMap() {
       mapRef.current = null;
     };
   }, [applyStep]);
+
+  // Live camera readout (center/zoom/pitch/bearing) to help locate spots precisely
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (!showCameraInfo) return;
+
+    let raf = 0;
+    const update = () => {
+      const c = map.getCenter();
+      setCameraLive({
+        center: [Number(c.lng.toFixed(6)), Number(c.lat.toFixed(6))],
+        zoom: Number(map.getZoom().toFixed(2)),
+        pitch: Number(map.getPitch().toFixed(1)),
+        bearing: Number(map.getBearing().toFixed(1)),
+      });
+      raf = 0;
+    };
+
+    const onMove = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+
+    update();
+    map.on("move", onMove);
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      map.off("move", onMove);
+    };
+  }, [showCameraInfo]);
 
   // Step changes
   useEffect(() => {
@@ -662,18 +701,63 @@ export default function KhartoumStoryMap() {
 
   // Legend data
   const legends = [
-    { category: "building", label: "Building", color: "#ff2f00", status: "damaged" },
-    { category: "building", label: "Building", color: "#ffffff", status: "undamaged" },
-    { category: "building", label: "Building", color: "#ededed", status: "unknown" },
-    { category: "education", label: "Education", color: "#00a83c", status: "damaged" },
-    { category: "education", label: "Education", color: "#00d24d", status: "undamaged" },
-    { category: "health", label: "Health", color: "#ff7f00", status: "damaged" },
-    { category: "health", label: "Health", color: "#ffd200", status: "undamaged" },
+    {
+      category: "building",
+      label: "Building",
+      color: "#ff2f00",
+      status: "damaged",
+    },
+    {
+      category: "building",
+      label: "Building",
+      color: "#ffffff",
+      status: "undamaged",
+    },
+    {
+      category: "building",
+      label: "Building",
+      color: "#ededed",
+      status: "unknown",
+    },
+    {
+      category: "education",
+      label: "Education",
+      color: "#00a83c",
+      status: "damaged",
+    },
+    {
+      category: "education",
+      label: "Education",
+      color: "#00d24d",
+      status: "undamaged",
+    },
+    {
+      category: "health",
+      label: "Health",
+      color: "#ff7f00",
+      status: "damaged",
+    },
+    {
+      category: "health",
+      label: "Health",
+      color: "#ffd200",
+      status: "undamaged",
+    },
     { category: "power", label: "Power", color: "#ff9900", status: "damaged" },
-    { category: "power", label: "Power", color: "#ffd640", status: "undamaged" },
+    {
+      category: "power",
+      label: "Power",
+      color: "#ffd640",
+      status: "undamaged",
+    },
     { category: "waste", label: "Waste", color: "#b0724f", status: "all" },
     { category: "water", label: "Water", color: "#00b7ff", status: "damaged" },
-    { category: "water", label: "Water", color: "#0099ff", status: "undamaged" },
+    {
+      category: "water",
+      label: "Water",
+      color: "#0099ff",
+      status: "undamaged",
+    },
   ];
 
   return (
@@ -686,7 +770,6 @@ export default function KhartoumStoryMap() {
 
       {/* Top bar (minimal) */}
       <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-
         <button
           onClick={() => setExploreMode((v) => !v)}
           className="px-3 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-xs font-medium hover:bg-white"
@@ -701,6 +784,14 @@ export default function KhartoumStoryMap() {
           title="Clear selection"
         >
           Clear
+        </button>
+
+        <button
+          onClick={() => setShowCameraInfo((v) => !v)}
+          className="px-3 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-xs font-medium hover:bg-white"
+          title="Toggle camera info"
+        >
+          {showCameraInfo ? "Hide cam" : "Show cam"}
         </button>
       </div>
 
@@ -737,7 +828,10 @@ export default function KhartoumStoryMap() {
                 <div className="font-semibold text-black/70">Color</div>
               </div>
               {legends.map((leg, idx) => (
-                <div key={idx} className="grid grid-cols-3 gap-2 items-center text-xs">
+                <div
+                  key={idx}
+                  className="grid grid-cols-3 gap-2 items-center text-xs"
+                >
                   <div className="text-black/80 truncate">{leg.label}</div>
                   <div className="text-black/80 capitalize">
                     {leg.status === "all" ? "—" : leg.status}
@@ -867,6 +961,16 @@ export default function KhartoumStoryMap() {
           <div className="rounded-xl bg-white/90 border border-black/10 px-4 py-3 text-sm">
             Missing <span className="font-mono">NEXT_PUBLIC_MAPBOX_TOKEN</span>
           </div>
+        </div>
+      )}
+
+      {showCameraInfo && (
+        <div className="absolute bottom-4 left-4 z-30 rounded-xl bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 py-2 text-xs text-black/80 space-y-1">
+          <div className="font-semibold text-black/90">Camera (live)</div>
+          <div>center: [{cameraLive.center.join(", ")}]</div>
+          <div>zoom: {cameraLive.zoom}</div>
+          <div>pitch: {cameraLive.pitch}</div>
+          <div>bearing: {cameraLive.bearing}</div>
         </div>
       )}
     </div>

@@ -73,13 +73,6 @@ export default function KhartoumStoryMap() {
     title: string;
     lines: string[];
   } | null>(null);
-  const [showCameraInfo, setShowCameraInfo] = useState(false);
-  const [cameraLive, setCameraLive] = useState({
-    center: [32.55, 15.51666667] as [number, number],
-    zoom: 15,
-    pitch: 60,
-    bearing: 0,
-  });
 
   const stories = useMemo(
     () => ({
@@ -585,38 +578,6 @@ export default function KhartoumStoryMap() {
     };
   }, [applyStep]);
 
-  // Live camera readout (center/zoom/pitch/bearing) to help locate spots precisely
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-    if (!showCameraInfo) return;
-
-    let raf = 0;
-    const update = () => {
-      const c = map.getCenter();
-      setCameraLive({
-        center: [Number(c.lng.toFixed(6)), Number(c.lat.toFixed(6))],
-        zoom: Number(map.getZoom().toFixed(2)),
-        pitch: Number(map.getPitch().toFixed(1)),
-        bearing: Number(map.getBearing().toFixed(1)),
-      });
-      raf = 0;
-    };
-
-    const onMove = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(update);
-    };
-
-    update();
-    map.on("move", onMove);
-
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      map.off("move", onMove);
-    };
-  }, [showCameraInfo]);
-
   // Step changes
   useEffect(() => {
     if (!ready) return;
@@ -784,14 +745,6 @@ export default function KhartoumStoryMap() {
           title="Clear selection"
         >
           Clear
-        </button>
-
-        <button
-          onClick={() => setShowCameraInfo((v) => !v)}
-          className="px-3 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-xs font-medium hover:bg-white"
-          title="Toggle camera info"
-        >
-          {showCameraInfo ? "Hide cam" : "Show cam"}
         </button>
       </div>
 
@@ -964,15 +917,6 @@ export default function KhartoumStoryMap() {
         </div>
       )}
 
-      {showCameraInfo && (
-        <div className="absolute bottom-4 left-4 z-30 rounded-xl bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 py-2 text-xs text-black/80 space-y-1">
-          <div className="font-semibold text-black/90">Camera (live)</div>
-          <div>center: [{cameraLive.center.join(", ")}]</div>
-          <div>zoom: {cameraLive.zoom}</div>
-          <div>pitch: {cameraLive.pitch}</div>
-          <div>bearing: {cameraLive.bearing}</div>
-        </div>
-      )}
     </div>
   );
 }

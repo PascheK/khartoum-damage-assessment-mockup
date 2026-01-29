@@ -395,8 +395,8 @@ export default function Page() {
                 </h3>
                 <div className="mt-6">
                   <BeforeAfterCompare
-                    beforeSrc="/images/hospital_before.jpg"
-                    afterSrc="/images/hospital_after.jpg"
+                    afterSrc="/images/hospital_before.jpg"
+                    beforeSrc="/images/hospital_after.jpg"
                     beforeLabel="2023"
                     afterLabel="2025"
                     alt="Satellite imagery comparison"
@@ -412,8 +412,8 @@ export default function Page() {
                 </h3>
                 <div className="mt-6">
                   <BeforeAfterCompare
-                    beforeSrc="/images/school_before.jpg"
-                    afterSrc="/images/school_after.jpg"
+                    afterSrc="/images/school_before.jpg"
+                    beforeSrc="/images/school_after.jpg"
                     beforeLabel="2023"
                     afterLabel="2025"
                     alt="Satellite imagery comparison"

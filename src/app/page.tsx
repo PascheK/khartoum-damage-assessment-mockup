@@ -506,9 +506,6 @@ export default function Page() {
         <Container>
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm text-gray-600">
             <p>© {new Date().getFullYear()} Khartoum Damage Assessment</p>
-            <p className="text-xs">
-              Methodology / sources / credits — placeholder
-            </p>
           </div>
         </Container>
       </footer>
